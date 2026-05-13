@@ -21,46 +21,43 @@ const Home = () => {
     };
 
     //
-  const buscarVuelos = async (e) => {
+   const buscarVuelos = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     const token = localStorage.getItem('token');
+    console.log('Token:', token); 
 
     try {
-        // Construimos la URL con parámetros para un GET, igual que en Postman
-        const url = `/api/vuelos/disponibles?origen=${searchData.origen}&destino=${searchData.destino}&fechaSalida=${searchData.fechaSalida}T00:00:00`;
-
-        const response = await fetch(url, {
-            method: 'GET', // Cambiado a GET para coincidir con tu prueba exitosa
+        const response = await fetch('/api/vuelos/disponibles', {
+            method: 'POST',                        
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify({                
+                origen: searchData.origen,
+                destino: searchData.destino,
+                fechaSalida: `${searchData.fechaSalida}T08:00:00`
+            })
         });
 
-        if (response.status === 403) {
-            throw new Error('Acceso denegado (403). Revisa los permisos de tu usuario en el Backend.');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Error ${response.status}`);
         }
 
         const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || 'Error al buscar vuelos');
-        }
-
         setVuelos(data);
         setShowResults(true);
 
     } catch (err) {
-        setError(err.message);
+        setError("Error: " + err.message);
     } finally {
         setLoading(false);
     }
 };
-    
-    //
+  
 
     if (showResults) {
         return (
