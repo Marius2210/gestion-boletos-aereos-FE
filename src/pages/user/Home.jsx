@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import '../../styles/Home.css';
+import Sidebar from '../../components/common/Sidebar';
 
 const Home = () => {
     const { user, logout } = useAuth();
@@ -59,17 +60,12 @@ const Home = () => {
 };
   
 
-    if (showResults) {
-        return (
-            <div className="home-container">
-                <div className="navbar">
-                    <div className="navbar-brand">✈️ AeroBooking</div>
-                    <div className="navbar-user">
-                        <span>👤 {user?.email}</span>
-                        <button onClick={logout} className="btn-logout">Cerrar Sesión</button>
-                    </div>
-                </div>
-                
+   if (showResults) {
+    return (
+        <div style={{ display: 'flex' }}>
+            <Sidebar user={user} logout={logout} />
+            
+            <div className="home-container" style={{ marginLeft: '250px', width: '100%' }}>
                 <div className="results-container">
                     <button onClick={() => setShowResults(false)} className="btn-back">
                         ← Nueva Búsqueda
@@ -106,7 +102,7 @@ const Home = () => {
                                     <div className="vuelo-footer">
                                         <div className="tarifas">
                                             {vuelo.tarifas.map((tarifa) => (
-                                                <button 
+                                                <button
                                                     key={tarifa.idTarifa}
                                                     className="btn-tarifa"
                                                     onClick={() => alert(`Seleccionaste ${tarifa.clase}: $${tarifa.precio}`)}
@@ -122,24 +118,20 @@ const Home = () => {
                     )}
                 </div>
             </div>
-        );
-    }
+        </div>
+    );
+}
 
-    return (
-        <div className="home-container">
-            <div className="navbar">
-                <div className="navbar-brand">✈️ AeroBooking</div>
-                <div className="navbar-user">
-                    <span>👤 {user?.email}</span>
-                    <button onClick={logout} className="btn-logout">Cerrar Sesión</button>
-                </div>
-            </div>
-            
+return (
+    <div style={{ display: 'flex' }}>
+        <Sidebar user={user} logout={logout} />
+
+        <div className="home-container" style={{ marginLeft: '250px', width: '100%' }}>
             <div className="hero-section">
                 <h1>Encuentra tu próximo destino</h1>
                 <p>Los mejores precios en boletos aéreos</p>
             </div>
-            
+
             <div className="search-card">
                 <form onSubmit={buscarVuelos} className="search-form">
                     <div className="search-row">
@@ -188,11 +180,12 @@ const Home = () => {
                         </button>
                     </div>
                 </form>
-                
+
                 {error && <div className="error-message">{error}</div>}
             </div>
         </div>
-    );
+    </div>
+);
 };
 
 export default Home;

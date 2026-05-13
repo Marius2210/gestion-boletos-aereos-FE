@@ -1,6 +1,14 @@
 .home-container {
     min-height: 100vh;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     flex: 1;                    /* ← ocupa el espacio restante */
+    width: calc(100% - 250px); /* ← descuenta el ancho del sidebar */
+    box-sizing: border-box;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
 }
 
 .navbar {
