@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 
 import Login from './pages/public/Login'
 import Registro from './pages/public/Registro'
+import Home from './pages/user/Home'
 
 function App() {
   return (
@@ -11,6 +12,11 @@ function App() {
       <Route path="/login" element={<Login />} />
 
       <Route path="/registro" element={<Registro />} />
+
+      {/* Ruta Privada del Usuario */}
+      <Route path="/home" element={<Home />} />
+
+      
     </Routes>
   )
 }

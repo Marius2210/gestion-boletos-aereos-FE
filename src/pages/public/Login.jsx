@@ -1,11 +1,13 @@
-import { Link } from 'react-router-dom';
-import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom'; // Importamos useNavigate
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext'; // Importamos tu contexto
 import { validateLogin } from '../../utils/validations';
 import '../../styles/Login.css';
 
-// Versión sin react-router-dom
 const Login = () => {
-    // Estados del formulario
+    const navigate = useNavigate();
+    const { setUser, user } = useAuth(); // Extraemos lo necesario del contexto
+
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -13,114 +15,79 @@ const Login = () => {
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [serverError, setServerError] = useState('');
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userData, setUserData] = useState(null);
 
-    // Manejar cambios en los inputs
+    // EFECTO: Si el usuario ya está logueado, mandarlo al Home automáticamente
+    useEffect(() => {
+        if (user || localStorage.getItem('token')) {
+            navigate('/home');
+        }
+    }, [user, navigate]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        if (errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: '' }));
-        }
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
         if (serverError) setServerError('');
     };
 
-//
-
-   // Manejar envío del formulario con fetch
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    const validationErrors = validateLogin(formData.email, formData.password);
-    if (Object.keys(validationErrors).length > 0) {
-        setErrors(validationErrors);
-        return;
-    }
-    
-    setIsLoading(true);
-    setServerError('');
-    
-    try {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-                email: formData.email, 
-                password: formData.password 
-            })
-        });
-
-       
-        const dataText = await response.text();
-        let data;
-
+        const validationErrors = validateLogin(formData.email, formData.password);
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+        
+        setIsLoading(true);
+        setServerError('');
+        
         try {
-            data = JSON.parse(dataText);
-        } catch (e) {
-           
-            data = { message: dataText };
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    email: formData.email, 
+                    password: formData.password 
+                })
+            });
+
+            const dataText = await response.text();
+            let data;
+
+            try {
+                data = JSON.parse(dataText);
+            } catch (e) {
+                data = { message: dataText };
+            }
+
+            if (!response.ok) {
+                throw new Error(data.error || data.message || 'Error al iniciar sesión');
+            }
+
+            // 1. Guardar en LocalStorage
+            localStorage.setItem('token', data.token);
+            const userPayload = { email: data.email, rol: data.rol };
+            localStorage.setItem('user', JSON.stringify(userPayload));
+
+            // 2. ACTUALIZAR EL CONTEXTO GLOBAL
+            setUser(userPayload); 
+
+            // 3. REDIRIGIR AL HOME
+            navigate('/home');
+            
+        } catch (error) {
+            setServerError(error.message || 'Error de conexión');
+        } finally {
+            setIsLoading(false);
         }
-
-        if (!response.ok) {
-            throw new Error(data.error || data.message || 'Error al iniciar sesión');
-        }
-
-        
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify({ 
-            email: data.email, 
-            rol: data.rol 
-        }));
-
-        setUserData(data);
-        setIsLoggedIn(true);
-        
-    } catch (error) {
-        setServerError(error.message || 'Error de conexión');
-    } finally {
-        setIsLoading(false);
-    }
-};
-
-    
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setIsLoggedIn(false);
-        setUserData(null);
-        setFormData({ email: '', password: '' });
     };
-
-    // Si ya inició sesión, mostrar bienvenida
-    if (isLoggedIn) {
-        return (
-            <div className="login-container">
-                <div className="login-card">
-                    <div className="login-header">
-                        <h1> Sistema de Boletos Aéreos</h1>
-                        <h2>¡Bienvenido!</h2>
-                    </div>
-                    <div style={{ textAlign: 'center', padding: '20px' }}>
-                        <p><strong>Email:</strong> {userData?.email}</p>
-                        <p><strong>Rol:</strong> {userData?.rol === 'ADMIN' ? 'Administrador' : 'Usuario'}</p>
-                        <button onClick={handleLogout} className="btn-login">
-                            Cerrar Sesión
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="login-container">
             <div className="login-card">
                 <div className="login-header">
-                    <h1> Sistema de Boletos Aéreos</h1>
+                    <h1>Sistema de Boletos Aéreos</h1>
                     <h2>Iniciar Sesión</h2>
                 </div>
 
@@ -167,13 +134,13 @@ const handleSubmit = async (e) => {
                 </form>
 
                 <div className="login-footer">
-                <p>
-               ¿No tienes cuenta?{' '}
-               <Link to="/registro" className="link-registro">
-                Regístrate aquí
-               </Link>
-             </p>
-           </div>           
+                    <p>
+                        ¿No tienes cuenta?{' '}
+                        <Link to="/registro" className="link-registro">
+                            Regístrate aquí
+                        </Link>
+                    </p>
+                </div>           
             </div>
         </div>
     );
