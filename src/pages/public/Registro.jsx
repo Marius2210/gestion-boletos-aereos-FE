@@ -110,63 +110,71 @@ const Registro = () => {
         setServerError('');
         setSuccessMessage('');
         
+      try {
+    const response = await fetch('/api/usuarios/registrar', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            nombreCompleto: formData.nombreCompleto,
+            numPasaporte: formData.numPasaporte,
+            fechaNac: formData.fechaNac ? `${formData.fechaNac}T00:00:00` : null,
+            nacionalidad: formData.nacionalidad,
+            email: formData.email,
+            numTelefono: formData.numTelefono,
+            password: formData.password
+        })
+    });
+
+    
+    const dataText = await response.text();
+
+    if (!response.ok) {
+       
+        let errorMessage = dataText;
         try {
-            const response = await fetch('http://localhost:8080/api/usuarios/registrar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    nombreCompleto: formData.nombreCompleto,
-                    numPasaporte: formData.numPasaporte,
-                    fechaNac: formData.fechaNac,
-                    nacionalidad: formData.nacionalidad,
-                    email: formData.email,
-                    numTelefono: formData.numTelefono,
-                    password: formData.password
-                })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Error al registrar usuario');
-            }
-
-            // Registro exitoso
-            setSuccessMessage(data || '¡Registro exitoso! Ahora puedes iniciar sesión.');
+            const errorJson = JSON.parse(dataText);
+            errorMessage = errorJson.error || errorJson.message || dataText;
+        } catch (e) {
             
-            // Limpiar formulario
-            setFormData({
-                nombreCompleto: '',
-                numPasaporte: '',
-                fechaNac: '',
-                nacionalidad: '',
-                email: '',
-                numTelefono: '',
-                password: '',
-                confirmPassword: ''
-            });
-            
-            // Mostrar opción para ir al login después de 2 segundos
-            setTimeout(() => {
-                setShowLogin(true);
-            }, 2000);
-            
-        } catch (error) {
-            setServerError(error.message || 'Error de conexión con el servidor');
-        } finally {
-            setIsLoading(false);
         }
+        throw new Error(errorMessage || 'Error al registrar usuario');
+    }
+
+    setSuccessMessage(dataText || '¡Registro exitoso! Ahora puedes iniciar sesión.');
+    
+    // Limpiar formulario
+    setFormData({
+        nombreCompleto: '',
+        numPasaporte: '',
+        fechaNac: '',
+        nacionalidad: '',
+        email: '',
+        numTelefono: '',
+        password: '',
+        confirmPassword: ''
+    });
+    
+    setTimeout(() => {
+        setShowLogin(true);
+    }, 2000);
+    
+} catch (error) {
+    
+    setServerError(error.message || 'Error de conexión con el servidor');
+} finally {
+    setIsLoading(false);
+}
     };
 
-    // Si el registro fue exitoso y pasaron 2 segundos
+    
     if (showLogin) {
         return (
             <div className="registro-container">
                 <div className="registro-card">
                     <div className="registro-header">
-                        <h1>✈️ Sistema de Boletos Aéreos</h1>
+                        <h1> Sistema de Boletos Aéreos</h1>
                         <h2>¡Registro Exitoso!</h2>
                     </div>
                     <div className="success-message-box">

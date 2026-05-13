@@ -26,54 +26,67 @@ const Login = () => {
         if (serverError) setServerError('');
     };
 
-    // Manejar envío del formulario con fetch
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+//
+
+   // Manejar envío del formulario con fetch
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    const validationErrors = validateLogin(formData.email, formData.password);
+    if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        return;
+    }
+    
+    setIsLoading(true);
+    setServerError('');
+    
+    try {
         
-        const validationErrors = validateLogin(formData.email, formData.password);
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-            return;
-        }
-        
-        setIsLoading(true);
-        setServerError('');
-        
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                email: formData.email, 
+                password: formData.password 
+            })
+        });
+
+       
+        const dataText = await response.text();
+        let data;
+
         try {
-            const response = await fetch('http://localhost:8080/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ 
-                    email: formData.email, 
-                    password: formData.password 
-                })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Error al iniciar sesión');
-            }
-
-            // Guardar token
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify({ 
-                email: data.email, 
-                rol: data.rol 
-            }));
-
-            setUserData(data);
-            setIsLoggedIn(true);
-            
-        } catch (error) {
-            setServerError(error.message || 'Error de conexión');
-        } finally {
-            setIsLoading(false);
+            data = JSON.parse(dataText);
+        } catch (e) {
+           
+            data = { message: dataText };
         }
-    };
 
+        if (!response.ok) {
+            throw new Error(data.error || data.message || 'Error al iniciar sesión');
+        }
+
+        
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify({ 
+            email: data.email, 
+            rol: data.rol 
+        }));
+
+        setUserData(data);
+        setIsLoggedIn(true);
+        
+    } catch (error) {
+        setServerError(error.message || 'Error de conexión');
+    } finally {
+        setIsLoading(false);
+    }
+};
+
+    
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
