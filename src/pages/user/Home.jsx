@@ -26,6 +26,29 @@ const Home = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    // ← Validaciones
+    if (!searchData.origen.trim()) {
+        setError('Por favor ingresa la ciudad de origen.');
+        setLoading(false);
+        return;
+    }
+    if (!searchData.destino.trim()) {
+        setError('Por favor ingresa la ciudad de destino.');
+        setLoading(false);
+        return;
+    }
+    if (!searchData.fechaSalida) {
+        setError('Por favor selecciona una fecha de salida.');
+        setLoading(false);
+        return;
+    }
+    if (searchData.origen.trim() === searchData.destino.trim()) {
+        setError('El origen y el destino no pueden ser iguales.');
+        setLoading(false);
+        return;
+    }
+
     const token = localStorage.getItem('token');
     console.log('Token:', token); 
 

@@ -1,7 +1,10 @@
+import { useNavigate } from 'react-router-dom';
 import React from 'react';
 import '../../styles/Sidebar.css';
 
 const Sidebar = ({ user, logout }) => {
+
+  const navigate = useNavigate();
     return (
         <div className="sidebar">
             <h2 className="sidebar-logo"> AeroBooking</h2>
@@ -11,8 +14,12 @@ const Sidebar = ({ user, logout }) => {
             </div>
 
             <nav className="sidebar-menu">
-                <button> Inicio</button>
-                <button> Mis Reservas</button>
+               <button onClick={() => navigate("/home")}>
+                Inicio
+               </button>
+                <button onClick={() => navigate("/crear-reserva")}>
+                    Mis Reservas
+                </button>
                 <button> Buscar Vuelos</button>
             </nav>
 
