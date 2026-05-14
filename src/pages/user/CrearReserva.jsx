@@ -20,6 +20,11 @@ const CrearReserva = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
+    //estados para las validaciones 
+const [numeroTarjeta, setNumeroTarjeta] = useState('');
+const [fechaExp, setFechaExp] = useState('');
+const [cvv, setCvv] = useState('');
+
     useEffect(() => {
         const vueloData = sessionStorage.getItem('vueloSeleccionado');
         if (!vueloData) {
@@ -79,6 +84,21 @@ const CrearReserva = () => {
     };
 
     const handleConfirmarPago = async () => {
+
+     // Validaciones
+    if (!numeroTarjeta || numeroTarjeta.length < 16) {
+        setError('Ingresa un número de tarjeta válido de 16 dígitos');
+        return;
+    }
+    if (!fechaExp || !/^\d{2}\/\d{2}$/.test(fechaExp)) {
+        setError('Ingresa una fecha válida en formato MM/AA');
+        return;
+    }
+    if (!cvv || cvv.length < 3) {
+        setError('Ingresa un CVV válido de 3 dígitos');
+        return;
+    }
+
         setLoading(true);
         setError('');
 
@@ -164,16 +184,31 @@ const CrearReserva = () => {
                         <div className="form-pago">
                             <div className="form-group">
                                 <label>Número de tarjeta</label>
-                                <input type="text" placeholder="**** **** **** 1234" />
+                                <input type="text" 
+                                placeholder="**** **** **** 1234" 
+                                value={numeroTarjeta}
+                                onChange={(e) => setNumeroTarjeta(e.target.value)}
+                                 maxLength={16}
+                                />
                             </div>
                             <div className="form-row">
                                 <div className="form-group">
                                     <label>Fecha expiración</label>
-                                    <input type="text" placeholder="MM/AA" />
+                                    <input type="text" 
+                                    placeholder="MM/AA" 
+                                    value={fechaExp}
+                                    onChange={(e) => setFechaExp(e.target.value)}
+                                     maxLength={5}
+                                    />
                                 </div>
                                 <div className="form-group">
                                     <label>CVV</label>
-                                    <input type="text" placeholder="123" />
+                                    <input type="text" 
+                                    placeholder="123"
+                                    value={cvv}
+                                    onChange={(e) => setCvv(e.target.value)}
+                                    maxLength={3}
+                                     />
                                 </div>
                             </div>
                         </div>
