@@ -1,0 +1,217 @@
+/* SelectorAsiento.css */
+.selector-asiento {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Sección de asientos rápidos recomendados */
+.asiento-rapido {
+    margin-bottom: 24px;
+}
+
+.asiento-rapido label {
+    display: block;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.asientos-recomendados {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.asiento-recomendado {
+    width: 60px;
+    height: 60px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.asiento-recomendado:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background: #45a049;
+}
+
+.asiento-recomendado.selected {
+    background: #2196F3;
+    border: 3px solid #0b5e9e;
+    transform: scale(1.05);
+}
+
+/* Botón para mostrar/ocultar mapa */
+.btn-mapa {
+    width: 100%;
+    background: #e3f2fd;
+    color: #1976d2;
+    border: 2px solid #1976d2;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 16px 0;
+    transition: all 0.2s ease;
+}
+
+.btn-mapa:hover {
+    background: #1976d2;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Asiento seleccionado */
+.asiento-seleccionado {
+    margin: 20px 0;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border-left: 4px solid #4CAF50;
+}
+
+.asiento-seleccionado label {
+    display: block;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.asiento-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    background: white;
+    color: #333;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.asiento-input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+/* Botón confirmar asiento */
+.btn-confirmar-asiento {
+    width: 100%;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    margin-top: 8px;
+}
+
+.btn-confirmar-asiento:hover:not(:disabled) {
+    background: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.btn-confirmar-asiento:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Loading y errores dentro del selector */
+.selector-loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.selector-error {
+    background: #ffebee;
+    color: #c62828;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 16px 0;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .selector-asiento {
+        padding: 16px;
+    }
+    
+    .asiento-recomendado {
+        width: 50px;
+        height: 50px;
+        font-size: 12px;
+    }
+    
+    .btn-mapa {
+        font-size: 14px;
+        padding: 10px;
+    }
+    
+    .btn-confirmar-asiento {
+        padding: 12px;
+        font-size: 14px;
+    }
+    
+    .asiento-input {
+        padding: 10px;
+        font-size: 14px;
+    }
+}
+
+/* Animaciones */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.asiento-recomendado.selected {
+    animation: pulse 0.3s ease;
+}
+
+/* Tooltip para información de asientos */
+.asiento-recomendado {
+    position: relative;
+}
+
+.asiento-recomendado:hover::after {
+    content: attr(data-asiento);
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 10;
+}

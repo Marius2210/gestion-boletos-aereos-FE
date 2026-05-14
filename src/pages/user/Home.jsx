@@ -1,9 +1,12 @@
+import { useNavigate } from 'react-router-dom'; // Añade esto
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import '../../styles/Home.css';
 import Sidebar from '../../components/common/Sidebar';
 
 const Home = () => {
+   const navigate = useNavigate();// Inicializa aquí
+
     const { user, logout } = useAuth();
     const [showResults, setShowResults] = useState(false);
     const [vuelos, setVuelos] = useState([]);
@@ -124,15 +127,26 @@ const Home = () => {
                                     </div>
                                     <div className="vuelo-footer">
                                         <div className="tarifas">
-                                            {vuelo.tarifas.map((tarifa) => (
-                                                <button
-                                                    key={tarifa.idTarifa}
-                                                    className="btn-tarifa"
-                                                    onClick={() => alert(`Seleccionaste ${tarifa.clase}: $${tarifa.precio}`)}
-                                                >
-                                                    {tarifa.clase}: ${tarifa.precio}
-                                                </button>
-                                            ))}
+                                           
+                                        
+{vuelo.tarifas.map((tarifa) => (
+    <button
+        key={tarifa.idTarifa}
+        className="btn-tarifa"
+        onClick={() => {
+    const vueloConTarifa = {
+        ...vuelo,
+        tarifaSeleccionada: tarifa
+    };
+    sessionStorage.setItem('vueloSeleccionado', JSON.stringify(vueloConTarifa));
+    navigate('/crear-reserva');
+}}
+    >
+        {tarifa.clase}: ${tarifa.precio}
+    </button>
+))}
+
+
                                         </div>
                                     </div>
                                 </div>

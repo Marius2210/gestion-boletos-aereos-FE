@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         const result = await authService.login(email, password);
         if (result.success) {
-            const userData = { email: result.data.email, rol: result.data.rol };
+            const userData = { email: result.data.email, rol: result.data.rol, idPasajero: result.data.idPasajero,nombrePasajero: result.data.nombrePasajero };
             setUser(userData);
             setIsAuthenticated(true);
         }

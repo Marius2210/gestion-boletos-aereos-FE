@@ -1,0 +1,94 @@
+.mapa-asientos-container {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.mapa-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.fila-asientos {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.fila-numero {
+    width: 40px;
+    font-weight: bold;
+    color: #666;
+}
+
+.asientos-fila {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.asiento {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.asiento:hover:not(:disabled) {
+    transform: scale(1.05);
+}
+
+.asiento-ventana {
+    background: #4CAF50;
+    color: white;
+}
+
+.asiento-pasillo {
+    background: #2196F3;
+    color: white;
+}
+
+.asiento-centro {
+    background: #FF9800;
+    color: white;
+}
+
+.asiento-ocupado {
+    background: #f44336;
+    color: white;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.asiento-reservado {
+    background: #FFC107;
+    color: #333;
+    cursor: not-allowed;
+}
+
+.asiento-seleccionado {
+    border: 3px solid #000;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.mapa-leyenda {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #fff;
+    border-radius: 8px;
+}
+
+.leyenda-ventana {
+    background: #4CAF50;
+    padding: 4px 12px;
+    border-radius: 4px;
+    color: white;
+}

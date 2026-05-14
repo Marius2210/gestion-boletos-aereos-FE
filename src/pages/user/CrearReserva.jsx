@@ -1,115 +1,76 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import SelectorAsiento from '../../components/SelectorAsiento';
+import reservaService from '../../services/reservaService';
+import pagoService from '../../services/pagoService';
+import pasajeroService from '../../services/pasajeroService';
 import '../../styles/CrearReserva.css';
+import Sidebar from '../../components/common/Sidebar';
 
-const CrearReserva = ({ vueloSeleccionado, onReservaCreada, onCancelar }) => {
-    const { user } = useAuth();
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+const CrearReserva = () => {
+    const navigate = useNavigate();
+    const { user, logout } = useAuth();
+    const [vuelo, setVuelo] = useState(null);
     const [pasajero, setPasajero] = useState(null);
-    const [cargandoPasajero, setCargandoPasajero] = useState(true);
-    const [formData, setFormData] = useState({
-        idVuelo: vueloSeleccionado?.idVuelo || '',
-        idPasajero: '',
-        asientoPreferencia: '',
-        idTarifa: ''
-    });
-    const [tarifaSeleccionada, setTarifaSeleccionada] = useState(null);
-    const [reservaCreada, setReservaCreada] = useState(null);
+    const [asientoSeleccionado, setAsientoSeleccionado] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [step, setStep] = useState(1); // 1: Selección de asiento, 2: Confirmación, 3: Pago
+    const [reserva, setReserva] = useState(null);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
-    // Cargar información del pasajero autenticado
     useEffect(() => {
-        const cargarPasajero = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                
-                // Buscar pasajero por email (asumiendo que hay un endpoint)
-                // Si no hay endpoint, se puede pedir manualmente
-                const response = await fetch(`http://localhost:8080/api/pasajeros/email/${user?.email}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    setPasajero(data);
-                    setFormData(prev => ({ ...prev, idPasajero: data.idPasajero }));
-                }
-            } catch (err) {
-                console.error('Error al cargar pasajero:', err);
-            } finally {
-                setCargandoPasajero(false);
-            }
-        };
-        
-        cargarPasajero();
+        const vueloData = sessionStorage.getItem('vueloSeleccionado');
+        if (!vueloData) {
+            navigate('/home');
+            return;
+        }
+        setVuelo(JSON.parse(vueloData));
+    }, []);
+
+    useEffect(() => {
+        if (user) {
+            console.log('User cargado:', user);
+            setPasajero({
+                idPasajero: user.idPasajero,
+                nombreCompleto: user.nombrePasajero
+            });
+        }
     }, [user]);
 
-    // Seleccionar tarifa
-    const seleccionarTarifa = (tarifa) => {
-        setTarifaSeleccionada(tarifa);
-        setFormData(prev => ({ 
-            ...prev, 
-            idTarifa: tarifa.idTarifa,
-            precioTotal: tarifa.precio
-        }));
-        setError('');
+
+    const handleConfirmarAsiento = async (asiento) => {
+        setAsientoSeleccionado(asiento);
+        setStep(2);
     };
 
-    // Manejar cambio de asiento
-    const handleAsientoChange = (e) => {
-        setFormData(prev => ({ ...prev, asientoPreferencia: e.target.value }));
-    };
+    const handleCrearReserva = async () => {
+        if (!pasajero || !vuelo || !asientoSeleccionado) {
+            setError('Faltan datos para crear la reserva');
+            return;
+        }
 
-    // Crear reserva
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        
-        if (!formData.idTarifa) {
-            setError('Por favor selecciona una tarifa');
-            return;
-        }
-        
-        if (!formData.idPasajero) {
-            setError('No se encontró información del pasajero');
-            return;
-        }
-        
+         // ← Agrega aquí
+    console.log('Datos a enviar:', {
+        idVuelo: vuelo.idVuelo,
+        idPasajero: pasajero.idPasajero,
+        asientoSeleccionado,
+        idTarifa: vuelo.tarifaSeleccionada.idTarifa
+    });
+
         setLoading(true);
         setError('');
-        
+
         try {
-            const token = localStorage.getItem('token');
-            
-            const requestBody = {
-                idVuelo: formData.idVuelo,
-                idPasajero: formData.idPasajero,
-                asientoPreferencia: formData.asientoPreferencia || null,
-                idTarifa: formData.idTarifa
-            };
-            
-            const response = await fetch('http://localhost:8080/api/reservas/crear', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(requestBody)
-            });
-            
-            const data = await response.json();
-            
-            if (!response.ok) {
-                throw new Error(data.error || 'Error al crear la reserva');
-            }
-            
-            setReservaCreada(data);
-            
-            if (onReservaCreada) {
-                onReservaCreada(data);
-            }
-            
+            const nuevaReserva = await reservaService.crearReserva(
+                vuelo.idVuelo,
+                pasajero.idPasajero,
+                asientoSeleccionado,
+                vuelo.tarifaSeleccionada.idTarifa
+            );
+            setReserva(nuevaReserva);
+            setStep(3);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -117,228 +78,155 @@ const CrearReserva = ({ vueloSeleccionado, onReservaCreada, onCancelar }) => {
         }
     };
 
-    // Si ya se creó la reserva, mostrar confirmación
-    if (reservaCreada) {
-        return (
-            <div className="crear-reserva-container">
-                <div className="reserva-confirmacion-card">
-                    <div className="confirmacion-header">
-                        <div className="check-icon">✓</div>
-                        <h2>¡Reserva Creada Exitosamente!</h2>
-                    </div>
-                    
-                    <div className="confirmacion-info">
-                        <div className="info-row">
-                            <span className="info-label">Código de Reserva:</span>
-                            <span className="info-value code">{reservaCreada.codigoReserva}</span>
-                        </div>
-                        <div className="info-row">
-                            <span className="info-label">Estado:</span>
-                            <span className="info-value status-pen">Pendiente de pago</span>
-                        </div>
-                        <div className="info-row">
-                            <span className="info-label">Precio Total:</span>
-                            <span className="info-value price">${reservaCreada.precioTotal}</span>
-                        </div>
-                    </div>
-                    
-                    <div className="confirmacion-vuelo">
-                        <h3>✈️ Detalles del Vuelo</h3>
-                        <div className="vuelo-detalle">
-                            <div className="aerolinea">{reservaCreada.vuelo.aerolineaNombre}</div>
-                            <div className="vuelo-numero">{reservaCreada.vuelo.numeroVuelo}</div>
-                            <div className="ruta">
-                                <span>{reservaCreada.vuelo.origen}</span>
-                                <span className="flecha">→</span>
-                                <span>{reservaCreada.vuelo.destino}</span>
-                            </div>
-                            <div className="fechas">
-                                <div>Salida: {new Date(reservaCreada.vuelo.fechaSalida).toLocaleString()}</div>
-                                <div>Llegada: {new Date(reservaCreada.vuelo.fechaLlegada).toLocaleString()}</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div className="confirmacion-pasajero">
-                        <h3>👤 Datos del Pasajero</h3>
-                        <div className="pasajero-detalle">
-                            <div><strong>Nombre:</strong> {reservaCreada.pasajero.nombreCompleto}</div>
-                            <div><strong>Pasaporte:</strong> {reservaCreada.pasajero.numPasaporte}</div>
-                            <div><strong>Nacionalidad:</strong> {reservaCreada.pasajero.nacionalidad}</div>
-                            {reservaCreada.asientoPreferencia && (
-                                <div><strong>Asiento:</strong> {reservaCreada.asientoPreferencia}</div>
-                            )}
-                        </div>
-                    </div>
-                    
-                    <div className="confirmacion-buttons">
-                        <button 
-                            className="btn-pagar"
-                            onClick={() => alert('Redirigiendo a pago...')}
-                        >
-                            Proceder al Pago
-                        </button>
-                        <button 
-                            className="btn-cancelar"
-                            onClick={onCancelar}
-                        >
-                            Volver a la búsqueda
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    const handleConfirmarPago = async () => {
+        setLoading(true);
+        setError('');
 
-    if (cargandoPasajero) {
+        try {
+            const pago = await pagoService.confirmarPago(
+                reserva.idReserva,
+                vuelo.tarifaSeleccionada.precio,
+                'TARJETA_CREDITO'
+            );
+            setSuccess('¡Pago confirmado! Tu reserva ha sido completada.');
+            setStep(4);
+            
+            // Limpiar datos de sesión
+            sessionStorage.removeItem('vueloSeleccionado');
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const renderStep = () => {
+        switch(step) {
+            case 1:
+                return (
+                    <div className="step-container">
+                        <h2>Paso 1: Selecciona tu asiento</h2>
+                        {vuelo && (
+                            <div className="vuelo-info">
+                                <p><strong>{vuelo.aerolineaNombre}</strong> - {vuelo.numeroVuelo}</p>
+                                <p>{vuelo.origen} → {vuelo.destino}</p>
+                                <p>Fecha: {new Date(vuelo.fechaSalida).toLocaleString()}</p>
+                                <p>Tarifa: {vuelo.tarifaSeleccionada.clase} - ${vuelo.tarifaSeleccionada.precio}</p>
+                            </div>
+                        )}
+                        <SelectorAsiento 
+                            idVuelo={vuelo?.idVuelo}
+                            onConfirmarAsiento={handleConfirmarAsiento}
+                        />
+                    </div>
+                );
+            
+            case 2:
+                return (
+                    <div className="step-container">
+                        <h2>Paso 2: Confirma tu reserva</h2>
+                        <div className="resumen-reserva">
+                            <h3>Detalles del vuelo</h3>
+                            <p><strong>Aerolínea:</strong> {vuelo?.aerolineaNombre}</p>
+                            <p><strong>Vuelo:</strong> {vuelo?.numeroVuelo}</p>
+                            <p><strong>Ruta:</strong> {vuelo?.origen} → {vuelo?.destino}</p>
+                            <p><strong>Fecha:</strong> {new Date(vuelo?.fechaSalida).toLocaleString()}</p>
+                            <p><strong>Asiento:</strong> {asientoSeleccionado}</p>
+                            <p><strong>Tarifa:</strong> {vuelo?.tarifaSeleccionada.clase}</p>
+                            <p><strong>Precio total:</strong> ${vuelo?.tarifaSeleccionada.precio}</p>
+                        </div>
+                        <div className="pasajero-info">
+                            <h3>Datos del pasajero</h3>
+                            <p><strong>Nombre:</strong> {pasajero?.nombreCompleto}</p>
+                            <p><strong>Email:</strong> {user?.email}</p>
+                        </div>
+                        {error && <div className="error-message">{error}</div>}
+                        <div className="step-buttons">
+                            <button onClick={() => setStep(1)} className="btn-back-step">
+                                Volver
+                            </button>
+                            <button onClick={handleCrearReserva} disabled={loading} className="btn-confirm">
+                                {loading ? 'Creando...' : 'Confirmar Reserva'}
+                            </button>
+                        </div>
+                    </div>
+                );
+            
+            case 3:
+                return (
+                    <div className="step-container">
+                        <h2>Paso 3: Realizar pago</h2>
+                        <div className="pago-info">
+                            <p><strong>Reserva código:</strong> {reserva?.codigoReserva}</p>
+                            <p><strong>Monto a pagar:</strong> ${vuelo?.tarifaSeleccionada.precio}</p>
+                            <p><strong>Método de pago:</strong> Tarjeta de Crédito</p>
+                        </div>
+                        <div className="form-pago">
+                            <div className="form-group">
+                                <label>Número de tarjeta</label>
+                                <input type="text" placeholder="**** **** **** 1234" />
+                            </div>
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Fecha expiración</label>
+                                    <input type="text" placeholder="MM/AA" />
+                                </div>
+                                <div className="form-group">
+                                    <label>CVV</label>
+                                    <input type="text" placeholder="123" />
+                                </div>
+                            </div>
+                        </div>
+                        {error && <div className="error-message">{error}</div>}
+                        <div className="step-buttons">
+                            <button onClick={() => setStep(2)} className="btn-back-step">
+                                Volver
+                            </button>
+                            <button onClick={handleConfirmarPago} disabled={loading} className="btn-pagar">
+                                {loading ? 'Procesando...' : 'Pagar $' + vuelo?.tarifaSeleccionada?.precio}
+                            </button>
+                        </div>
+                    </div>
+                );
+            
+            case 4:
+                return (
+                    <div className="step-container success-container">
+                        <div className="success-icon">✓</div>
+                        <h2>¡Reserva Confirmada!</h2>
+                        <p>Tu reserva ha sido completada exitosamente.</p>
+                        <div className="resumen-final">
+                            <p><strong>Código de reserva:</strong> {reserva?.codigoReserva}</p>
+                            <p><strong>Asiento:</strong> {asientoSeleccionado}</p>
+                            <p><strong>Total pagado:</strong> ${vuelo?.tarifaSeleccionada.precio}</p>
+                        </div>
+                        <button onClick={() => navigate('/home')} className="btn-home">
+                            Volver al Inicio
+                        </button>
+                    </div>
+                );
+            
+            default:
+                return null;
+        }
+    };
+
+    if (!vuelo) {
         return (
-            <div className="crear-reserva-container">
-                <div className="loading-card">
-                    <div className="spinner"></div>
-                    <p>Cargando información...</p>
+            <div style={{ display: 'flex' }}>
+                <Sidebar user={user} logout={logout} />
+                <div className="crear-reserva-container">
+                    <p>Cargando datos del vuelo...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="crear-reserva-container">
-            <div className="reserva-card">
-                <div className="reserva-header">
-                    <button className="btn-back" onClick={onCancelar}>← Volver</button>
-                    <h2>Completar Reserva</h2>
-                </div>
-                
-                {error && <div className="error-message">{error}</div>}
-                
-                <form onSubmit={handleSubmit} className="reserva-form">
-                    {/* Información del Vuelo */}
-                    <div className="seccion">
-                        <h3>✈️ Información del Vuelo</h3>
-                        <div className="info-box">
-                            <div className="vuelo-info">
-                                <div className="aerolinea-info">
-                                    <span className="aerolinea-nombre">{vueloSeleccionado?.aerolineaNombre}</span>
-                                    <span className="vuelo-numero">{vueloSeleccionado?.numeroVuelo}</span>
-                                </div>
-                                <div className="ruta-info">
-                                    <div className="ciudad">
-                                        <strong>{vueloSeleccionado?.origen}</strong>
-                                        <small>{new Date(vueloSeleccionado?.fechaSalida).toLocaleString()}</small>
-                                    </div>
-                                    <span className="flecha">→</span>
-                                    <div className="ciudad">
-                                        <strong>{vueloSeleccionado?.destino}</strong>
-                                        <small>{new Date(vueloSeleccionado?.fechaLlegada).toLocaleString()}</small>
-                                    </div>
-                                </div>
-                                <div className="avion-info">
-                                    ✈️ {vueloSeleccionado?.avionModelo} | Capacidad: {vueloSeleccionado?.capacidad}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {/* Selección de Tarifa */}
-                    <div className="seccion">
-                        <h3>💰 Selecciona tu Tarifa</h3>
-                        <div className="tarifas-grid">
-                            {vueloSeleccionado?.tarifas?.map((tarifa) => (
-                                <div 
-                                    key={tarifa.idTarifa}
-                                    className={`tarifa-card ${tarifaSeleccionada?.idTarifa === tarifa.idTarifa ? 'selected' : ''}`}
-                                    onClick={() => seleccionarTarifa(tarifa)}
-                                >
-                                    <div className="tarifa-clase">{tarifa.clase}</div>
-                                    <div className="tarifa-precio">${tarifa.precio}</div>
-                                    <div className="tarifa-beneficios">
-                                        {tarifa.clase === 'Económica' && '✓ Equipaje de mano'}
-                                        {tarifa.clase === 'Ejecutiva' && '✓ Equipaje de mano ✓ Comida a bordo'}
-                                        {tarifa.clase === 'Primera Clase' && '✓ Todo incluido ✓ Asiento preferencial'}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                    
-                    {/* Datos del Pasajero */}
-                    <div className="seccion">
-                        <h3>👤 Datos del Pasajero</h3>
-                        <div className="pasajero-info-box">
-                            <div className="pasajero-row">
-                                <span className="label">Nombre completo:</span>
-                                <span>{pasajero?.nombreCompleto || user?.email}</span>
-                            </div>
-                            <div className="pasajero-row">
-                                <span className="label">Número de pasaporte:</span>
-                                <span>{pasajero?.numPasaporte || 'No registrado'}</span>
-                            </div>
-                            <div className="pasajero-row">
-                                <span className="label">Nacionalidad:</span>
-                                <span>{pasajero?.nacionalidad || 'No registrada'}</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {/* Preferencia de Asiento */}
-                    <div className="seccion">
-                        <h3>💺 Preferencia de Asiento (Opcional)</h3>
-                        <div className="asiento-options">
-                            <label className="asiento-option">
-                                <input 
-                                    type="radio" 
-                                    name="asiento" 
-                                    value="Ventana"
-                                    onChange={handleAsientoChange}
-                                />
-                                <span>Ventana</span>
-                            </label>
-                            <label className="asiento-option">
-                                <input 
-                                    type="radio" 
-                                    name="asiento" 
-                                    value="Pasillo"
-                                    onChange={handleAsientoChange}
-                                />
-                                <span>Pasillo</span>
-                            </label>
-                            <label className="asiento-option">
-                                <input 
-                                    type="radio" 
-                                    name="asiento" 
-                                    value="Sin preferencia"
-                                    onChange={handleAsientoChange}
-                                    defaultChecked
-                                />
-                                <span>Sin preferencia</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    {/* Resumen de Precio */}
-                    <div className="seccion resumen">
-                        <h3>📋 Resumen</h3>
-                        <div className="resumen-box">
-                            <div className="resumen-row">
-                                <span>Tarifa seleccionada:</span>
-                                <span>{tarifaSeleccionada?.clase || 'No seleccionada'}</span>
-                            </div>
-                            <div className="resumen-row total">
-                                <span>Total a pagar:</span>
-                                <span>${tarifaSeleccionada?.precio || '0.00'}</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div className="form-buttons">
-                        <button type="button" className="btn-cancelar" onClick={onCancelar}>
-                            Cancelar
-                        </button>
-                        <button type="submit" className="btn-confirmar" disabled={loading}>
-                            {loading ? 'Creando reserva...' : 'Confirmar Reserva'}
-                        </button>
-                    </div>
-                </form>
+        <div style={{ display: 'flex' }}>
+            <Sidebar user={user} logout={logout} />
+            <div className="crear-reserva-container">
+                {renderStep()}
             </div>
         </div>
     );

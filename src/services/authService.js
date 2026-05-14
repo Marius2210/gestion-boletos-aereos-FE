@@ -23,7 +23,9 @@ const authService = {
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify({ 
                 email: data.email, 
-                rol: data.rol 
+                rol: data.rol ,
+                idPasajero: data.idPasajero,
+               nombrePasajero: data.nombrePasajero
             }));
 
             return { success: true, data };

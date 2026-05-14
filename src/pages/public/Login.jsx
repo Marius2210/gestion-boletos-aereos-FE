@@ -67,7 +67,7 @@ const Login = () => {
 
             // 1. Guardar en LocalStorage
             localStorage.setItem('token', data.token);
-            const userPayload = { email: data.email, rol: data.rol };
+            const userPayload = { email: data.email, rol: data.rol,idPasajero: data.idPasajero,  nombrePasajero: data.nombrePasajero  };
             localStorage.setItem('user', JSON.stringify(userPayload));
 
             // 2. ACTUALIZAR EL CONTEXTO GLOBAL
