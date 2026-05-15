@@ -4,6 +4,7 @@ import Login from './pages/public/Login'
 import Registro from './pages/public/Registro'
 import Home from './pages/user/Home'
 import CrearReserva from './pages/user/CrearReserva'
+import MisReservas from './pages/user/MisReservas'
 
 function App() {
   return (
@@ -19,6 +20,9 @@ function App() {
 
       {/* ruta de crear una reserva */}
       <Route path="/crear-reserva" element={<CrearReserva />} />
+
+       {/* ruta para ver la reservas */}
+      <Route path="/mis-reservas" element={<MisReservas />} /> 
 
       
     </Routes>

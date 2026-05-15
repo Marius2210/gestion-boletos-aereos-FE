@@ -19,6 +19,11 @@ const reservaService = {
     // Cancelar reserva
     cancelarReserva: async (codigoReserva) => {
         return apiService.authPut(`/reservas/cancelar/${codigoReserva}`);
+    },
+
+    // para obtener reserva por codigo
+    obtenerReservasPorPasajero: async (idPasajero) => {
+        return apiService.authGet(`/reservas/pasajero/${idPasajero}`);
     }
 };
 

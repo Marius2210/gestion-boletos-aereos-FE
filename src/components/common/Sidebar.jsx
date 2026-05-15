@@ -17,10 +17,10 @@ const Sidebar = ({ user, logout }) => {
                <button onClick={() => navigate("/home")}>
                 Inicio
                </button>
-                <button onClick={() => navigate("/crear-reserva")}>
+                <button onClick={() => navigate("/mis-reservas")}>
                     Mis Reservas
                 </button>
-                <button> Buscar Vuelos</button>
+                <button> Reclamos</button>
             </nav>
 
             <button onClick={logout} className="sidebar-logout">
