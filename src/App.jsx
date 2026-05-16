@@ -5,6 +5,11 @@ import Registro from './pages/public/Registro'
 import Home from './pages/user/Home'
 import CrearReserva from './pages/user/CrearReserva'
 import MisReservas from './pages/user/MisReservas'
+// Componentes de Administrador
+import DashboardAdmin from './pages/admin/DashboardAdmin'
+import UsuariosAdmin from './pages/admin/UsuariosAdmin'
+import AerolineasAdmin from './pages/admin/AerolineasAdmin'
+import VuelosAdmin from './pages/admin/VuelosAdmin'
 
 function App() {
   return (
@@ -24,6 +29,11 @@ function App() {
        {/* ruta para ver la reservas */}
       <Route path="/mis-reservas" element={<MisReservas />} /> 
 
+      {/* Rutas de Administrador */}
+      <Route path="/admin/dashboard" element={<DashboardAdmin />} />
+      <Route path="/admin/usuarios" element={<UsuariosAdmin />} />
+      <Route path="/admin/aerolineas" element={<AerolineasAdmin />} />
+      <Route path="/admin/vuelos" element={<VuelosAdmin />} />
       
     </Routes>
   )
