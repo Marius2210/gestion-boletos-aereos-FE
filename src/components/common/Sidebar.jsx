@@ -20,7 +20,7 @@ const Sidebar = ({ user, logout }) => {
                 <button onClick={() => navigate("/mis-reservas")}>
                     Mis Reservas
                 </button>
-                <button> Reclamos</button>
+                
             </nav>
 
             <button onClick={logout} className="sidebar-logout">

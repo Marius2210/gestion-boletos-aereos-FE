@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import Sidebar from '../../components/common/Sidebar';
 import reservaService from '../../services/reservaService';
 import pagoService from '../../services/pagoService';
+import reclamoService from '../../services/reclamoService';
 import '../../styles/MisReservas.css';
 
 const MisReservas = () => {
@@ -20,6 +21,11 @@ const MisReservas = () => {
     const [fechaExp, setFechaExp] = useState('');
     const [cvv, setCvv] = useState('');
     const [loadingPago, setLoadingPago] = useState(false);
+
+    //estados para el reclamo 
+const [reservaAReclamar, setReservaAReclamar] = useState(null);
+const [descripcionReclamo, setDescripcionReclamo] = useState('');
+const [loadingReclamo, setLoadingReclamo] = useState(false);
 
     useEffect(() => {
         if (user?.idPasajero) {
@@ -92,6 +98,30 @@ const MisReservas = () => {
         }
     };
 
+    // funcion para los reclamos 
+    const handleEnviarReclamo = async () => {
+    if (!descripcionReclamo.trim()) {
+        setError('Por favor escribe una descripción del reclamo');
+        return;
+    }
+    if (descripcionReclamo.trim().length < 10) {
+        setError('La descripción debe tener al menos 10 caracteres');
+        return;
+    }
+    setLoadingReclamo(true);
+    setError('');
+    try {
+        await reclamoService.enviarReclamo(reservaAReclamar.idReserva, descripcionReclamo);
+        setMensaje('¡Reclamo enviado exitosamente!');
+        setReservaAReclamar(null);
+        setDescripcionReclamo('');
+    } catch (err) {
+        setError('No se pudo enviar el reclamo');
+    } finally {
+        setLoadingReclamo(false);
+    }
+};
+
     return (
         <div style={{ display: 'flex' }}>
             <Sidebar user={user} logout={logout} />
@@ -147,6 +177,14 @@ const MisReservas = () => {
                                                     </button>
                                                 </>
                                             )}
+                                              {reserva.estadoReserva === 'CONF' && (
+                                              <button
+                                              onClick={() => { setReservaAReclamar(reserva); setError(''); setMensaje(''); }}
+                                            className="btn-reclamar">
+                                           📝 Reclamar
+                                          </button>
+                                             )}
+
                                         </div>
                                     </div>
                                 </div>
@@ -233,6 +271,58 @@ const MisReservas = () => {
                     </div>
                 </div>
             )}
+            
+            {reservaAReclamar && (
+    <div style={{
+        position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+        backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex',
+        justifyContent: 'center', alignItems: 'center', zIndex: 1000
+    }}>
+        <div style={{
+            backgroundColor: 'white', borderRadius: '12px',
+            padding: '30px', width: '450px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+        }}>
+            <h3 style={{ marginTop: 0 }}>📝 Enviar Reclamo</h3>
+            <p><strong>Código:</strong> {reservaAReclamar.codigoReserva}</p>
+            <p><strong>Ruta:</strong> {reservaAReclamar.vuelo.origen} → {reservaAReclamar.vuelo.destino}</p>
+
+            <div style={{ marginTop: '15px' }}>
+                <label style={{ fontWeight: '600', display: 'block', marginBottom: '8px' }}>
+                    Descripción del reclamo
+                </label>
+                <textarea
+                    placeholder="Describe el problema con tu vuelo..."
+                    value={descripcionReclamo}
+                    onChange={(e) => setDescripcionReclamo(e.target.value)}
+                    rows={5}
+                    style={{
+                        width: '100%', padding: '10px', borderRadius: '6px',
+                        border: '1px solid #ddd', boxSizing: 'border-box',
+                        fontSize: '14px', resize: 'vertical'
+                    }}
+                />
+                <small style={{ color: '#999' }}>{descripcionReclamo.length} caracteres</small>
+            </div>
+
+            {error && <div style={{ color: 'red', margin: '10px 0', fontSize: '14px' }}>{error}</div>}
+
+            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                <button
+                    onClick={() => { setReservaAReclamar(null); setError(''); setDescripcionReclamo(''); }}
+                    style={{ flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid #ddd', cursor: 'pointer', background: 'white' }}>
+                    Cancelar
+                </button>
+                <button
+                    onClick={handleEnviarReclamo}
+                    disabled={loadingReclamo}
+                    style={{ flex: 1, padding: '10px', backgroundColor: '#667eea', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>
+                    {loadingReclamo ? 'Enviando...' : 'Enviar Reclamo'}
+                </button>
+            </div>
+        </div>
+    </div>
+)}
         </div>
     );
 };
