@@ -1,4 +1,4 @@
-// URL base de tu backend Spring Boot
+// URL base del backend Spring Boot
 const API_URL = '/api';
 
 // Obtener token del localStorage

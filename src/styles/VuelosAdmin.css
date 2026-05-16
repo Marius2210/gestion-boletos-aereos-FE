@@ -1,0 +1,119 @@
+/* VuelosAdmin.css - Estilos específicos para gestión de vuelos */
+
+/* Filtros de búsqueda */
+.filtros-container {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.filtros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.filtros-grid .form-group {
+    margin-bottom: 0;
+}
+
+/* Tarjetas de tarifas */
+.tarifas-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tarifa-badge {
+    background: #e3f2fd;
+    color: #2196f3;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Estado del vuelo */
+.estado-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.estado-P {
+    background: #e3f2fd;
+    color: #2196f3;
+}
+
+.estado-V {
+    background: #fff3e0;
+    color: #ff9800;
+}
+
+.estado-A {
+    background: #e8f5e9;
+    color: #4caf50;
+}
+
+.estado-C {
+    background: #fee;
+    color: #e74c3c;
+}
+
+/* Selector de estado */
+.estado-select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.estado-select.P { background: #e3f2fd; color: #2196f3; }
+.estado-select.V { background: #fff3e0; color: #ff9800; }
+.estado-select.A { background: #e8f5e9; color: #4caf50; }
+.estado-select.C { background: #fee; color: #e74c3c; }
+
+/* Contenedor de tarifas dinámicas */
+.tarifas-container {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.tarifa-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.tarifa-item input {
+    flex: 1;
+}
+
+.btn-add-tarifa {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.btn-remove-tarifa {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
