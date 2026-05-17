@@ -20,12 +20,32 @@ const Sidebar = ({ user, logout }) => {
                 <button onClick={() => navigate("/mis-reservas")}>
                     Mis Reservas
                 </button>
+
+                {user?.rol === 'ADMIN' && (
+                    <>
+                        <button onClick={() => navigate("/admin/dashboard")}>
+                            Dashboard
+                        </button>
+                        <button onClick={() => navigate("/admin/usuarios")}>
+                            Usuarios
+                        </button>
+                        <button onClick={() => navigate("/admin/aerolineas")}>
+                            Aerolíneas
+                        </button>
+                        <button onClick={() => navigate("/admin/vuelos")}>
+                            Vuelos
+                        </button>
+                    </>
+                )}
                 
             </nav>
 
             <button onClick={logout} className="sidebar-logout">
                 Cerrar sesión
             </button>
+
+              
+
         </div>
     );
 };
