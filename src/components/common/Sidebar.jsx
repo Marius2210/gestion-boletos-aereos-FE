@@ -35,6 +35,12 @@ const Sidebar = ({ user, logout }) => {
                         <button onClick={() => navigate("/admin/vuelos")}>
                             Vuelos
                         </button>
+                        <button onClick={() => navigate("/admin/aviones")}>
+                         Aviones
+                        </button>
+                        <button onClick={() => navigate("/admin/tripulantes")}>
+                         Tripulación
+                        </button>
                     </>
                 )}
                 

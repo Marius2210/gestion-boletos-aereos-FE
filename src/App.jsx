@@ -10,6 +10,8 @@ import DashboardAdmin from './pages/admin/DashboardAdmin'
 import UsuariosAdmin from './pages/admin/UsuariosAdmin'
 import AerolineasAdmin from './pages/admin/AerolineasAdmin'
 import VuelosAdmin from './pages/admin/VuelosAdmin'
+import AvionesAdmin from './pages/admin/AvionesAdmin'
+import TripulantesAdmin from './pages/admin/TripulantesAdmin'
 
 function App() {
   return (
@@ -34,6 +36,8 @@ function App() {
       <Route path="/admin/usuarios" element={<UsuariosAdmin />} />
       <Route path="/admin/aerolineas" element={<AerolineasAdmin />} />
       <Route path="/admin/vuelos" element={<VuelosAdmin />} />
+      <Route path="/admin/aviones" element={<AvionesAdmin />} />
+      <Route path="/admin/tripulantes" element={<TripulantesAdmin />} />
       
     </Routes>
   )
