@@ -1,44 +1,56 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { useAuth } from './context/AuthContext'
 
 import Login from './pages/public/Login'
 import Registro from './pages/public/Registro'
 import Home from './pages/user/Home'
 import CrearReserva from './pages/user/CrearReserva'
 import MisReservas from './pages/user/MisReservas'
-// Componentes de Administrador
 import DashboardAdmin from './pages/admin/DashboardAdmin'
 import UsuariosAdmin from './pages/admin/UsuariosAdmin'
 import AerolineasAdmin from './pages/admin/AerolineasAdmin'
 import VuelosAdmin from './pages/admin/VuelosAdmin'
 import AvionesAdmin from './pages/admin/AvionesAdmin'
 import TripulantesAdmin from './pages/admin/TripulantesAdmin'
+import ProtectedRoute from './components/common/ProtectedRoute'
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" />} />
-
       <Route path="/login" element={<Login />} />
-
       <Route path="/registro" element={<Registro />} />
 
-      {/* Ruta Privada del Usuario */}
-      <Route path="/home" element={<Home />} />
+      {/* Rutas protegidas de Usuario */}
+      <Route path="/home" element={
+        <ProtectedRoute><Home /></ProtectedRoute>
+      } />
+      <Route path="/crear-reserva" element={
+        <ProtectedRoute><CrearReserva /></ProtectedRoute>
+      } />
+      <Route path="/mis-reservas" element={
+        <ProtectedRoute><MisReservas /></ProtectedRoute>
+      } />
 
-      {/* ruta de crear una reserva */}
-      <Route path="/crear-reserva" element={<CrearReserva />} />
-
-       {/* ruta para ver la reservas */}
-      <Route path="/mis-reservas" element={<MisReservas />} /> 
-
-      {/* Rutas de Administrador */}
-      <Route path="/admin/dashboard" element={<DashboardAdmin />} />
-      <Route path="/admin/usuarios" element={<UsuariosAdmin />} />
-      <Route path="/admin/aerolineas" element={<AerolineasAdmin />} />
-      <Route path="/admin/vuelos" element={<VuelosAdmin />} />
-      <Route path="/admin/aviones" element={<AvionesAdmin />} />
-      <Route path="/admin/tripulantes" element={<TripulantesAdmin />} />
-      
+      {/* Rutas protegidas de Administrador */}
+      <Route path="/admin/dashboard" element={
+        <ProtectedRoute requiereAdmin={true}><DashboardAdmin /></ProtectedRoute>
+      } />
+      <Route path="/admin/usuarios" element={
+        <ProtectedRoute requiereAdmin={true}><UsuariosAdmin /></ProtectedRoute>
+      } />
+      <Route path="/admin/aerolineas" element={
+        <ProtectedRoute requiereAdmin={true}><AerolineasAdmin /></ProtectedRoute>
+      } />
+      <Route path="/admin/vuelos" element={
+        <ProtectedRoute requiereAdmin={true}><VuelosAdmin /></ProtectedRoute>
+      } />
+      <Route path="/admin/aviones" element={
+        <ProtectedRoute requiereAdmin={true}><AvionesAdmin /></ProtectedRoute>
+      } />
+      <Route path="/admin/tripulantes" element={
+        <ProtectedRoute requiereAdmin={true}><TripulantesAdmin /></ProtectedRoute>
+      } />
     </Routes>
   )
 }
