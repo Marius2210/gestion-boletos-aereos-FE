@@ -28,6 +28,11 @@ const VuelosAdmin = () => {
         idAvion: '',
         tarifas: [{ clase: '', precio: '' }]
     });
+const [showModalTripulacion, setShowModalTripulacion] = useState(false);
+const [vueloTripulacion, setVueloTripulacion] = useState(null);
+const [tripulantesAsignados, setTripulantesAsignados] = useState([]);
+const [tripulantesDisponibles, setTripulantesDisponibles] = useState([]);
+const [loadingTripulacion, setLoadingTripulacion] = useState(false);
 
     useEffect(() => {
         cargarDatos();
@@ -232,6 +237,53 @@ const VuelosAdmin = () => {
         return true;
     });
 
+    const abrirModalTripulacion = async (vuelo) => {
+    setVueloTripulacion(vuelo);
+    setLoadingTripulacion(true);
+    setShowModalTripulacion(true);
+    try {
+        const [asignados, disponibles] = await Promise.all([
+            adminService.obtenerTripulantesVuelo(vuelo.idVuelo),
+            adminService.obtenerTripulantesDisponibles(vuelo.idVuelo)
+        ]);
+        setTripulantesAsignados(asignados);
+        setTripulantesDisponibles(disponibles);
+    } catch (err) {
+        alert('Error al cargar tripulación');
+    } finally {
+        setLoadingTripulacion(false);
+    }
+};
+
+const handleAsignarTripulante = async (idTripulante) => {
+    try {
+        await adminService.asignarTripulantes(vueloTripulacion.idVuelo, [idTripulante]);
+        const [asignados, disponibles] = await Promise.all([
+            adminService.obtenerTripulantesVuelo(vueloTripulacion.idVuelo),
+            adminService.obtenerTripulantesDisponibles(vueloTripulacion.idVuelo)
+        ]);
+        setTripulantesAsignados(asignados);
+        setTripulantesDisponibles(disponibles);
+    } catch (err) {
+        alert('Error al asignar tripulante');
+    }
+};
+
+const handleRemoverTripulante = async (idTripulante) => {
+    if (!window.confirm('¿Remover este tripulante del vuelo?')) return;
+    try {
+        await adminService.removerTripulanteVuelo(vueloTripulacion.idVuelo, idTripulante);
+        const [asignados, disponibles] = await Promise.all([
+            adminService.obtenerTripulantesVuelo(vueloTripulacion.idVuelo),
+            adminService.obtenerTripulantesDisponibles(vueloTripulacion.idVuelo)
+        ]);
+        setTripulantesAsignados(asignados);
+        setTripulantesDisponibles(disponibles);
+    } catch (err) {
+        alert('Error al remover tripulante');
+    }
+};
+
     if (loading) return (
         <div style={{ display: 'flex' }}>
             <Sidebar user={user} logout={logout} />
@@ -370,6 +422,12 @@ const VuelosAdmin = () => {
                                             onClick={() => eliminarVuelo(vuelo.idVuelo, vuelo.numeroVuelo)}
                                         >
                                             Eliminar
+                                        </button>
+                                        <button
+                                        className="btn-toggle"
+                                       onClick={() => abrirModalTripulacion(vuelo)}
+                                         >
+                                       👨‍✈️ Tripulación
                                         </button>
                                     </td>
                                 </tr>
@@ -580,7 +638,87 @@ const VuelosAdmin = () => {
                         </div>
                     </div>
                 )}
+                {showModalTripulacion && (
+    <div className="modal">
+        <div className="modal-content" style={{ maxWidth: '650px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h3 style={{ margin: 0 }}>👨‍✈️ Tripulación - {vueloTripulacion?.numeroVuelo}</h3>
+                <button onClick={() => setShowModalTripulacion(false)}
+                    style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#999' }}>
+                    ✕
+                </button>
             </div>
+
+            {loadingTripulacion ? (
+                <p style={{ textAlign: 'center' }}>Cargando...</p>
+            ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    {/* Tripulantes asignados */}
+                    <div>
+                        <h4 style={{ color: '#333', marginBottom: '10px' }}>
+                            ✅ Asignados ({tripulantesAsignados.length})
+                        </h4>
+                        {tripulantesAsignados.length === 0 ? (
+                            <p style={{ color: '#999', fontSize: '14px' }}>No hay tripulantes asignados</p>
+                        ) : (
+                            tripulantesAsignados.map(t => (
+                                <div key={t.idTripulante} style={{
+                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                    padding: '10px', borderRadius: '8px', border: '1px solid #eee',
+                                    marginBottom: '8px', backgroundColor: '#f9f9f9'
+                                }}>
+                                    <div>
+                                        <p style={{ margin: 0, fontWeight: '600', fontSize: '14px' }}>{t.nombre}</p>
+                                        <p style={{ margin: 0, color: '#666', fontSize: '12px' }}>{t.cargo}</p>
+                                    </div>
+                                    <button className="btn-delete" style={{ padding: '4px 10px', fontSize: '12px' }}
+                                        onClick={() => handleRemoverTripulante(t.idTripulante)}>
+                                        Remover
+                                    </button>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    {/* Tripulantes disponibles */}
+                    <div>
+                        <h4 style={{ color: '#333', marginBottom: '10px' }}>
+                            ➕ Disponibles ({tripulantesDisponibles.length})
+                        </h4>
+                        {tripulantesDisponibles.length === 0 ? (
+                            <p style={{ color: '#999', fontSize: '14px' }}>No hay tripulantes disponibles</p>
+                        ) : (
+                            tripulantesDisponibles.map(t => (
+                                <div key={t.idTripulante} style={{
+                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                    padding: '10px', borderRadius: '8px', border: '1px solid #eee',
+                                    marginBottom: '8px', backgroundColor: '#f9f9f9'
+                                }}>
+                                    <div>
+                                        <p style={{ margin: 0, fontWeight: '600', fontSize: '14px' }}>{t.nombre}</p>
+                                        <p style={{ margin: 0, color: '#666', fontSize: '12px' }}>{t.cargo}</p>
+                                    </div>
+                                    <button className="btn-edit" style={{ padding: '4px 10px', fontSize: '12px' }}
+                                        onClick={() => handleAsignarTripulante(t.idTripulante)}>
+                                        Asignar
+                                    </button>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            )}
+
+            <div style={{ marginTop: '20px', textAlign: 'right' }}>
+                <button className="btn-cancel" onClick={() => setShowModalTripulacion(false)}>
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+)}
+            </div>
+            
         </div>
     );
 };

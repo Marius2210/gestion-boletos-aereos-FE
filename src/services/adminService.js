@@ -327,7 +327,29 @@ const adminService = {
      */
     eliminarTripulante: async (id) => {
         return apiService.authDelete(`/admin/tripulacion/${id}`);
-    }
+    },
+
+
+    // ==================== TRIPULACIÓN DE VUELOS ====================
+
+asignarTripulantes: async (idVuelo, idsTripulantes) => {
+    return apiService.authPost('/admin/vuelos/asignar-tripulantes', {
+        idVuelo,
+        idsTripulantes
+    });
+},
+
+obtenerTripulantesVuelo: async (idVuelo) => {
+    return apiService.authGet(`/admin/vuelos/${idVuelo}/tripulantes`);
+},
+
+removerTripulanteVuelo: async (idVuelo, idTripulante) => {
+    return apiService.authDelete(`/admin/vuelos/${idVuelo}/tripulantes/${idTripulante}`);
+},
+
+obtenerTripulantesDisponibles: async (idVuelo) => {
+    return apiService.authGet(`/admin/vuelos/${idVuelo}/tripulantes-disponibles`);
+},
 };
 
 export default adminService;
