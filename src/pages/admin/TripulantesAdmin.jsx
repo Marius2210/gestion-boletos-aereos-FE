@@ -222,10 +222,10 @@ const TripulantesAdmin = () => {
                                     <td>{tripulante.cantidadVuelosAsignados ?? 0}</td>
                                     <td>
                                         <button className="btn-edit" onClick={() => abrirModalEditar(tripulante)}>
-                                            ✏️ Editar
+                                             Editar
                                         </button>
                                         <button className="btn-delete" onClick={() => handleEliminar(tripulante.idTripulante)}>
-                                            🗑️ Eliminar
+                                             Eliminar
                                         </button>
                                     </td>
                                 </tr>
@@ -239,7 +239,7 @@ const TripulantesAdmin = () => {
                     <div className="modal">
                         <div className="modal-content" style={{ maxWidth: '500px' }}>
                             <h3 style={{ marginTop: 0, marginBottom: '20px' }}>
-                                {modoEdicion ? '✏️ Editar Tripulante' : '➕ Nuevo Tripulante'}
+                                {modoEdicion ? 'Editar Tripulante' : 'Nuevo Tripulante'}
                             </h3>
 
                             <div className="form-grid" style={{ gridTemplateColumns: '1fr' }}>

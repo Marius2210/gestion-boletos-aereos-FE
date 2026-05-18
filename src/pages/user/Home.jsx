@@ -122,7 +122,7 @@ const Home = () => {
                                             </div>
                                         </div>
                                         <div className="avion-info">
-                                            ✈️ {vuelo.avionModelo} | Capacidad: {vuelo.capacidad}
+                                            {vuelo.avionModelo} | Capacidad: {vuelo.capacidad}
                                         </div>
                                     </div>
                                     <div className="vuelo-footer">
@@ -173,7 +173,7 @@ return (
                 <form onSubmit={buscarVuelos} className="search-form">
                     <div className="search-row">
                         <div className="search-group">
-                            <label>✈️ Origen</label>
+                            <label>Origen</label>
                             <input
                                 type="text"
                                 name="origen"
@@ -184,7 +184,7 @@ return (
                             />
                         </div>
                         <div className="search-group">
-                            <label>📍 Destino</label>
+                            <label>Destino</label>
                             <input
                                 type="text"
                                 name="destino"
@@ -203,7 +203,7 @@ return (
                             </datalist>
                         </div>
                         <div className="search-group">
-                            <label>📅 Fecha</label>
+                            <label>Fecha</label>
                             <input
                                 type="date"
                                 name="fechaSalida"

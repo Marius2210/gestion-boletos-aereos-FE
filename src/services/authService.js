@@ -1,4 +1,4 @@
-// URL base de tu backend Spring Boot
+// URL base del backend Spring Boot
 const API_URL = 'http://localhost:8080/api';
 
 const authService = {

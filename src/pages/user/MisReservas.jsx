@@ -126,7 +126,7 @@ const [loadingReclamo, setLoadingReclamo] = useState(false);
         <div style={{ display: 'flex' }}>
             <Sidebar user={user} logout={logout} />
             <div className="mis-reservas-container">
-                <h1 className="mis-reservas-header">✈️ Mis Reservas</h1>
+                <h1 className="mis-reservas-header">Mis Reservas</h1>
 
                 <div className="mis-reservas-content">
                     {mensaje && <div className="mensaje-exito">{mensaje}</div>}
@@ -147,7 +147,7 @@ const [loadingReclamo, setLoadingReclamo] = useState(false);
                                 <div key={reserva.idReserva} className="reserva-card">
                                     <div className="reserva-card-header">
                                         <span className="reserva-ruta">
-                                            ✈️ {reserva.vuelo.origen} → {reserva.vuelo.destino}
+                                            {reserva.vuelo.origen} → {reserva.vuelo.destino}
                                         </span>
                                         <span className="reserva-aerolinea">
                                             {reserva.vuelo.aerolineaNombre}
@@ -168,7 +168,7 @@ const [loadingReclamo, setLoadingReclamo] = useState(false);
                                                     <button
                                                         onClick={() => { setReservaAPagar(reserva); setError(''); setMensaje(''); }}
                                                         className="btn-pagar-reserva">
-                                                        💳 Pagar
+                                                        Pagar
                                                     </button>
                                                     <button
                                                         onClick={() => handleCancelar(reserva.codigoReserva)}
@@ -181,7 +181,7 @@ const [loadingReclamo, setLoadingReclamo] = useState(false);
                                               <button
                                               onClick={() => { setReservaAReclamar(reserva); setError(''); setMensaje(''); }}
                                             className="btn-reclamar">
-                                           📝 Reclamar
+                                           Reclamar
                                           </button>
                                              )}
 
@@ -206,7 +206,7 @@ const [loadingReclamo, setLoadingReclamo] = useState(false);
                         padding: '30px', width: '400px',
                         boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
                     }}>
-                        <h3 style={{ marginTop: 0 }}>💳 Pagar Reserva</h3>
+                        <h3 style={{ marginTop: 0 }}>Pagar Reserva</h3>
                         <p><strong>Código:</strong> {reservaAPagar.codigoReserva}</p>
                         <p><strong>Ruta:</strong> {reservaAPagar.vuelo.origen} → {reservaAPagar.vuelo.destino}</p>
                         <p><strong>Monto:</strong> ${reservaAPagar.precioTotal}</p>
@@ -283,7 +283,7 @@ const [loadingReclamo, setLoadingReclamo] = useState(false);
             padding: '30px', width: '450px',
             boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
         }}>
-            <h3 style={{ marginTop: 0 }}>📝 Enviar Reclamo</h3>
+            <h3 style={{ marginTop: 0 }}>Enviar Reclamo</h3>
             <p><strong>Código:</strong> {reservaAReclamar.codigoReserva}</p>
             <p><strong>Ruta:</strong> {reservaAReclamar.vuelo.origen} → {reservaAReclamar.vuelo.destino}</p>
 

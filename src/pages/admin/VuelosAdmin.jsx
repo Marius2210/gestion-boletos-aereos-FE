@@ -265,7 +265,8 @@ const handleAsignarTripulante = async (idTripulante) => {
         setTripulantesAsignados(asignados);
         setTripulantesDisponibles(disponibles);
     } catch (err) {
-        alert('Error al asignar tripulante');
+        const errorMensaje = err.message || 'Error al asignar tripulante';
+        alert(errorMensaje);
     }
 };
 
@@ -280,7 +281,8 @@ const handleRemoverTripulante = async (idTripulante) => {
         setTripulantesAsignados(asignados);
         setTripulantesDisponibles(disponibles);
     } catch (err) {
-        alert('Error al remover tripulante');
+        const errorMensaje = err.message || 'Error al remover tripulante';
+        alert(errorMensaje);
     }
 };
 
@@ -427,7 +429,7 @@ const handleRemoverTripulante = async (idTripulante) => {
                                         className="btn-toggle"
                                        onClick={() => abrirModalTripulacion(vuelo)}
                                          >
-                                       👨‍✈️ Tripulación
+                                            Tripulación
                                         </button>
                                     </td>
                                 </tr>
